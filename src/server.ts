@@ -1,25 +1,39 @@
+// src/server.ts
 import express from 'express';
 import cors from 'cors'
 import dotenv from 'dotenv';
 import userRouter from './routes/userRoutes.ts';
 import errorHandler from './middlewares/errorHandler.ts';
+import { createGraphQLServer } from './graphql/index.ts';
 
 dotenv.config(); // import all .env var's...
 
-const app = express();
+async function bootstrap() {
+    const app: express.Application = express();
 
-app.use(express.json());
-app.use(cors());
+    app.use(express.json());
+    app.use(cors());
 
-// Routes...
-app.get('/', async (req, res) => {
-    return res.status(200).json({ success: true, message: `${req.url} API is Live!\nGo to '/api/users' to access content...` });
-});
+    // Create 'GraphQL-server' and apply as middleware...
+    const gqlServer = await createGraphQLServer();
+    gqlServer.applyMiddleware({ app, path: '/graphql' });
 
-app.use('/api/users', userRouter);
+    // REST routes
+    app.get('/', (req, res) => {
+        res.status(200).json({
+            success: true,
+            message: `${req.url} API is Live!\nGo to '/api/users' to access content...`,
+        });
+    });
 
-app.use(errorHandler);
+    app.use('/api/users', userRouter);
+    app.use(errorHandler);
 
-// Start server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+        console.log(`Server running (REST APIs) at http://localhost:${PORT}`);
+        console.log(`->GraphQL available at http://localhost:${PORT}/graphql`);
+    });
+}
+
+bootstrap();
