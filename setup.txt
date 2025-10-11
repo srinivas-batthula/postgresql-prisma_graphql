@@ -1,0 +1,8 @@
+==>> Local setup instructions...
+
+1. npm init -y  /  npm install
+2. npx prisma init
+3. Add `DATABASE_URL` in '.env' file
+4. npm run migrate && npm run generate  // OR // We can directly push schema via `npm run db:push`
+5. npm start
+6. `npm run studio` to visualize data in DB...
