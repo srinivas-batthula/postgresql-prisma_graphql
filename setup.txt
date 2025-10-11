@@ -6,3 +6,7 @@
 4. npm run migrate && npm run generate  // OR // We can directly push schema via `npm run db:push`
 5. npm start
 6. `npm run studio` to visualize data in DB...
+
+-->> EveryTime after any changes to DB schema, Do run these cmds,
+    1. npm run migrate
+    2. npm run generate
