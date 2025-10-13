@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
   type User {
@@ -8,14 +8,29 @@ export const typeDefs = gql`
     createdAt: String!
   }
 
+  input CreateUserInput {
+    name: String!
+    email: String!
+  }
+
+  input UpdateUserInput {
+    id: Int!
+    name: String
+    email: String
+  }
+
+  input GetUserByIdInput {
+    id: Int!
+  }
+
   type Query {
     users: [User!]!
-    user(id: Int!): User
+    user(input: GetUserByIdInput!): User
   }
 
   type Mutation {
-    createUser(name: String, email: String!): User!
-    updateUser(id: Int!, name: String, email: String): User
-    deleteUser(id: Int!): User!
+    createUser(input: CreateUserInput!): User!
+    updateUser(input: UpdateUserInput!): User
+    deleteUser(input: GetUserByIdInput!): User!
   }
 `;

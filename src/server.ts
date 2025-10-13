@@ -2,9 +2,12 @@
 import express from 'express';
 import cors from 'cors'
 import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
+import { expressMiddleware } from "@apollo/server/express4";
 import userRouter from './routes/userRoutes.ts';
 import errorHandler from './middlewares/errorHandler.ts';
 import { createGraphQLServer } from './graphql/index.ts';
+import { createLoaders } from "./graphql/loaders.ts";
 
 dotenv.config(); // import all .env var's...
 
@@ -16,9 +19,22 @@ async function bootstrap() {
 
     // Create 'GraphQL-server' and apply as middleware...
     const gqlServer = await createGraphQLServer();
-    gqlServer.applyMiddleware({ app, path: '/graphql' });
+    const { json } = bodyParser;
+    app.use(
+        "/graphql",
+        json(),
+        expressMiddleware(gqlServer, {
+            context: async ({ req }: { req: express.Request }) => {
+                // put things here used by resolvers: req (auth), loaders, etc.
+                return {
+                    req,
+                    loaders: createLoaders()
+                };
+            }
+        })
+    );
 
-    // REST routes
+    // REST-API routes...
     app.get('/', (req, res) => {
         res.status(200).json({
             success: true,

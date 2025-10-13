@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from '@apollo/server';
 import { typeDefs } from './schema.ts';
 import { resolvers } from './resolvers.ts';
 
